@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHostVinni - Gestão de Temporada</title>
+    <meta name="theme-color" content="#111827"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <div id="success-toast" class="toast hidden"></div>
+
+    <div class="main-layout">
+        <nav class="sidebar">
+            <div>
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-hat-wizard"></i> MyHostVinni</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="active"><a href="#dashboard" data-title="Dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                    <li><a href="#reservas" data-title="Reservas"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+                    <li><a href="#calendario-view" data-title="Calendário"><i class="fas fa-calendar-alt"></i> Calendário</a></li>
+                    <li><a href="#imoveis" data-title="Gestão de Imóveis"><i class="fas fa-house-chimney"></i> Imóveis</a></li>
+                    <li><a href="#clientes" data-title="Clientes"><i class="fas fa-users"></i> Clientes</a></li>
+                    <li><a href="#despesas" data-title="Controle de Despesas"><i class="fas fa-file-invoice-dollar"></i> Despesas</a></li>
+                    <li><a href="#checklists" data-title="Checklists"><i class="fas fa-tasks"></i> Checklists</a></li>
+                    <li><a href="#relatorios" data-title="Relatórios"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+                </ul>
+            </div>
+            <ul class="sidebar-footer">
+                <li><a href="#configuracoes" data-title="Configurações"><i class="fas fa-cog"></i> Configurações</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
+                <h1 id="page-title">Dashboard</h1>
+            </header>
+
+            <div class="content-body">
+                <section id="dashboard">
+                    <div class="dashboard-grid-principal">
+                        <div class="dashboard-kpis">
+                            <div class="card"><h3>Balanço do Mês <span class="tooltip-wrapper" data-tooltip="Receita do Mês - Custos Totais do Mês"><i class="fas fa-question-circle"></i></span></h3><p id="balanco-mensal">R$ 0,00</p></div>
+                            <div class="card"><h3>Taxa de Ocupação <span class="tooltip-wrapper" data-tooltip="Porcentagem de dias reservados em relação ao total de dias disponíveis no mês."><i class="fas fa-question-circle"></i></span></h3><p id="taxa-ocupacao">0%</p></div>
+                            <div class="card"><h3>Receita Paga (Mês) <span class="tooltip-wrapper" data-tooltip="Soma dos valores líquidos de todas as reservas pagas com check-in no mês atual."><i class="fas fa-question-circle"></i></span></h3><p id="receita-mensal">R$ 0,00</p></div>
+                            <div class="card"><h3>Custos Totais (Mês) <span class="tooltip-wrapper" data-tooltip="Soma de todas as despesas lançadas no mês + custos fixos dos imóveis."><i class="fas fa-question-circle"></i></span></h3><p id="custos-mensal">R$ 0,00</p></div>
+                        </div>
+                        <div class="card">
+                            <h2>Status das Reservas Ativas</h2>
+                            <div id="status-reservas-container"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="imoveis" class="hidden">
+                    <div class="form-container">
+                        <h2 id="form-imovel-titulo">Cadastrar Novo Imóvel</h2>
+                        <form id="form-imovel"><input type="hidden" id="imovel-id"><fieldset><div class="form-grid"><div class="form-group"><label for="imovel-nome">Nome do Imóvel <span class="tooltip-wrapper" data-tooltip="Um apelido para identificar fácil o imóvel. Ex: 'Apê da Praia'."><i class="fas fa-question-circle"></i></span></label><input type="text" id="imovel-nome" required></div><div class="form-group"><label for="imovel-cor">Cor de Destaque</label><input type="color" id="imovel-cor" value="#22D3EE"></div><div class="form-group"><label for="imovel-condominio">Condomínio (R$)</label><input type="number" step="0.01" id="imovel-condominio" placeholder="Apenas o valor"></div><div class="form-group"><label for="imovel-custo-fixo">Outros Custos Fixos (R$)</label><input type="number" step="0.01" id="imovel-custo-fixo" placeholder="IPTU, internet, etc."></div><div class="form-group form-group-full"><label for="imovel-wifi">Senha do Wi-Fi</label><input type="text" id="imovel-wifi"></div></div></fieldset><div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="btn-imovel-texto">Salvar Imóvel</span></button><button type="button" id="btn-cancelar-edicao-imovel" class="btn btn-secondary hidden"><i class="fas fa-times"></i> Cancelar</button></div></form>
+                    </div>
+                    <div class="cards-container"><h2>Imóveis Cadastrados</h2><div id="cards-imoveis-grid" class="cards-imoveis-grid"></div></div>
+                </section>
+                
+                <section id="reservas" class="hidden">
+                     <div class="form-container">
+                         <h2 id="form-reserva-titulo">Adicionar Nova Reserva</h2>
+                         <form id="form-reserva">
+                            <input type="hidden" id="reserva-id">
+                            <fieldset><legend>Detalhes da Reserva</legend><div class="form-grid"><div class="form-group"><label for="imovel">Imóvel</label><select id="imovel" required></select></div><div class="form-group"><label for="cliente">Cliente</label><select id="cliente" required></select></div><div class="form-group-datetime"><div class="form-group"><label for="data_checkin">Data de Check-in</label><input type="text" id="data_checkin" required></div><div class="form-group"><label for="hora_checkin">Hora</label><input type="time" id="hora_checkin" value="14:00" required></div></div><div class="form-group-datetime"><div class="form-group"><label for="data_checkout">Data de Check-out</label><input type="text" id="data_checkout" required></div><div class="form-group"><label for="hora_checkout">Hora</label><input type="time" id="hora_checkout" value="11:00" required></div></div><div class="form-group"><label for="hospedes">Hóspedes</label><input type="number" id="hospedes" value="1" min="1" required></div><div class="form-group"><label for="plataforma_reserva">Plataforma</label><select id="plataforma_reserva"><option>Airbnb</option><option>Booking.com</option><option>Direto</option><option>Outra</option></select></div></div></fieldset>
+                             <fieldset><legend>Dados Financeiros</legend><div class="form-grid"><div class="form-group"><label for="valor_total">Valor Total (R$) <span class="tooltip-wrapper" data-tooltip="O valor bruto da reserva, antes de qualquer taxa ou desconto."><i class="fas fa-question-circle"></i></span></label><input type="number" id="valor_total" step="0.01" required></div><div class="form-group"><label for="taxa_plataforma">Taxa da Plataforma (%)</label><input type="number" id="taxa_plataforma" step="0.1" value="15" required></div><div class="form-group"><label for="limpeza">Custo de Limpeza (R$)</label><input type="number" id="limpeza" step="0.01" value="150" required></div><div class="form-group"><label for="status">Status</label><select id="status" required><option value="Pago">Pago</option><option value="A Receber">A Receber</option><option value="Cancelado">Cancelado</option></select></div></div></fieldset>
+                             <div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> <span id="btn-reserva-texto">Verificar e Adicionar</span></button><button type="button" id="btn-cancelar-edicao-reserva" class="btn btn-secondary hidden"><i class="fas fa-times"></i> Cancelar</button></div>
+                         </form>
+                     </div>
+                     <div class="table-container"><h2>Histórico de Reservas</h2><table><thead><tr><th>Cliente</th><th>Imóvel</th><th>Check-in</th><th>Noites</th><th>Status</th><th>Checklist</th><th>Valor Líquido</th><th>Ações</th></tr></thead><tbody id="tabela-reservas-body"></tbody></table></div>
+                </section>
+
+                <section id="clientes" class="hidden">
+                    <div class="form-container">
+                        <h2 id="form-cliente-titulo">Adicionar Novo Cliente</h2>
+                        <form id="form-cliente"><input type="hidden" id="cliente-id"><div class="form-grid"><div class="form-group"><label for="cliente-nome">Nome</label><input type="text" id="cliente-nome" required></div><div class="form-group"><label for="cliente-sobrenome">Sobrenome</label><input type="text" id="cliente-sobrenome"></div><div class="form-group"><label for="cliente-telefone">Telefone</label><input type="tel" id="cliente-telefone"></div><div class="form-group"><label for="cliente-cidade">Cidade</label><input type="text" id="cliente-cidade"></div></div><div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> <span id="btn-cliente-texto">Adicionar Cliente</span></button><button type="button" id="btn-cancelar-edicao-cliente" class="btn btn-secondary hidden"><i class="fas fa-times"></i> Cancelar</button></div></form>
+                    </div>
+                    <div class="cards-container"><h2>Clientes Cadastrados</h2><div id="cards-clientes-grid" class="cards-clientes-grid"></div></div>
+                </section>
+
+                <section id="despesas" class="hidden">
+                    <div class="form-container">
+                        <h2 id="form-despesa-titulo">Adicionar Nova Despesa</h2>
+                        <form id="form-despesa">
+                            <input type="hidden" id="despesa-id">
+                            <div class="form-grid">
+                                <div class="form-group"><label for="despesa-imovel">Imóvel Associado</label><select id="despesa-imovel" required></select></div>
+                                <div class="form-group"><label for="despesa-data">Data da Despesa</label><input type="text" id="despesa-data" required></div>
+                                <div class="form-group"><label for="despesa-valor">Valor (R$)</label><input type="number" id="despesa-valor" step="0.01" required></div>
+                                <div class="form-group"><label for="despesa-categoria">Categoria</label><select id="despesa-categoria" required><option>Água</option><option>Luz</option><option>Gás</option><option>Internet</option><option>Limpeza</option><option>Manutenção</option><option>Impostos</option><option>Outros</option></select></div>
+                                <div class="form-group form-group-full"><label for="despesa-descricao">Descrição</label><input type="text" id="despesa-descricao" required></div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="btn-despesa-texto">Adicionar Despesa</span></button>
+                                <button type="button" id="btn-cancelar-edicao-despesa" class="btn btn-secondary hidden"><i class="fas fa-times"></i> Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-container"><h2>Histórico de Despesas</h2><table><thead><tr><th>Data</th><th>Imóvel</th><th>Categoria</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="tabela-despesas-body"></tbody></table></div>
+                </section>
+                
+                <section id="relatorios" class="hidden">
+                    <div class="relatorios-grid">
+                        <div class="card"><h3>Receita vs. Custos (Últimos 6 meses)</h3><div class="chart-wrapper"><canvas id="balancoChart"></canvas></div></div>
+                        <div class="card"><h3>Receita por Imóvel (Total)</h3><div class="chart-wrapper"><canvas id="receitaPorImovelChart"></canvas></div></div>
+                    </div>
+                </section>
+                
+                <section id="checklists" class="hidden">
+                    <div class="form-container">
+                        <h2>Modelos de Checklist por Imóvel</h2>
+                        <form id="form-checklist-modelo">
+                            <div class="form-grid">
+                                <div class="form-group"><label for="checklist-modelo-imovel">Selecione o Imóvel</label><select id="checklist-modelo-imovel" required></select></div>
+                                <div class="form-group"><label for="checklist-modelo-tarefa">Nova Tarefa</label><input type="text" id="checklist-modelo-tarefa" placeholder="Ex: Verificar toalhas limpas" required></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Tarefa ao Modelo</button>
+                        </form>
+                        <div id="modelos-checklist-container" class="modelos-checklist-container"></div>
+                    </div>
+                </section>
+                
+                <section id="configuracoes" class="hidden">
+                    <div class="form-container">
+                        <h2>Exportar Dados</h2>
+                        <p>Faça o backup dos seus dados ou exporte-os para usar em planilhas (formato CSV). O arquivo será baixado diretamente no seu computador.</p>
+                        <div class="export-buttons">
+                            <button id="btn-exportar-reservas-csv" class="btn btn-secondary"><i class="fas fa-file-csv"></i> Exportar Reservas</button>
+                            <button id="btn-exportar-despesas-csv" class="btn btn-secondary"><i class="fas fa-file-csv"></i> Exportar Despesas</button>
+                            <button id="btn-exportar-clientes-csv" class="btn btn-secondary"><i class="fas fa-file-csv"></i> Exportar Clientes</button>
+                            <button id="btn-exportar-imoveis-csv" class="btn btn-secondary"><i class="fas fa-file-csv"></i> Exportar Imóveis</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="calendario-view" class="hidden"><div class="card"><div id="calendario-container"></div></div></section>
+            </div>
+
+            <footer class="main-footer">
+                <p>&copy; 2025 MyHostVinni por <strong>vinniscodes</strong>. antcopy.</p>
+                <div class="social-links">
+                    <a href="https://github.com/vinniscodes" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/vinicius-de-andrade-melo-204486259" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <div id="confirmacao-reserva-modal" class="modal-overlay hidden">
+        <div class="modal-content"><h2 id="modal-title">Confirmar Reserva</h2><div id="modal-body"></div><div class="modal-footer"><button id="btn-cancelar-modal" class="btn btn-secondary">Cancelar</button><button id="btn-confirmar-reserva" class="btn btn-primary">Confirmar e Salvar</button></div></div>
+    </div>
+    <div id="checklist-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="checklist-modal-titulo">Checklist da Reserva</h2>
+            <div id="checklist-modal-body"></div>
+            <div class="modal-footer">
+                <button id="btn-fechar-checklist-modal" class="btn btn-secondary">Fechar</button>
+                <button id="btn-apagar-checklist" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Apagar Checklist</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
